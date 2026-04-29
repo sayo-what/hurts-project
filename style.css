@@ -60,19 +60,42 @@ button {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
-  animation: expand 1.5s ease-out forwards;
+
+  background: radial-gradient(circle,
+    rgba(255,255,255,0.5) 0%,
+    rgba(255,255,255,0.2) 30%,
+    rgba(255,255,255,0.05) 60%,
+    transparent 80%
+  );
+
+  box-shadow:
+    0 0 20px rgba(255,255,255,0.4),
+    0 0 40px rgba(255,255,255,0.2);
+
+  animation: expand 1.8s ease-out forwards;
 }
 
 @keyframes expand {
   from {
     width: 0;
     height: 0;
-    opacity: 0.8;
+    opacity: 0.9;
   }
   to {
-    width: 300px;
-    height: 300px;
+    width: 350px;
+    height: 350px;
     opacity: 0;
   }
+}
+
+
+canvas {
+  pointer-events: none;
+}
+
+.screen {
+  z-index: 1;
+}
+.screen {
+  pointer-events: auto;
 }
