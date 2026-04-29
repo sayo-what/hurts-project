@@ -6,22 +6,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let interactionCount = 0;
 
-  // 🔊 звук (без connectAudio — чтобы не ломалось)
-  function playBgSound() {
-    if (!bgSound) return;
+  /* ===== START ===== */
+
+  window.start = function () {
+    switchScreen("intro", "touchScreen");
 
     bgSound.volume = 0;
-
-    const playPromise = bgSound.play();
-
-    if (playPromise !== undefined) {
-      playPromise.catch(err => {
-        console.log("Audio blocked until user interaction");
-      });
-    }
+    bgSound.play();
 
     fadeInAudio(bgSound, 0.4, 2000);
-  }
+  };
 
   function fadeInAudio(audio, targetVolume, duration) {
     let step = 0.01;
@@ -41,13 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(to).classList.add("active");
   }
 
-  // 👉 старт по кнопке (ВАЖНО)
-  window.start = function () {
-    switchScreen("intro", "touchScreen");
-    playBgSound();
-  };
+  /* ===== TOUCH ===== */
 
-  // 🌊 касания / клики
   touchScreen.addEventListener("pointerdown", createWave);
 
   function createWave(e) {
@@ -56,68 +45,53 @@ document.addEventListener("DOMContentLoaded", () => {
     const x = e.clientX;
     const y = e.clientY;
 
-    createSingleWave(x, y, 0);
-    createSingleWave(x, y, 120);
-    createSingleWave(x, y, 240);
-
-    // 💡 вспышка
-    document.body.style.background =
-      `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.08), black 60%)`;
-
-    setTimeout(() => {
-      document.body.style.background = "black";
-    }, 300);
-
-    playTouchSound();
+    // 🌊 одна мягкая волна (без "шума")
+    createRipple(x, y);
 
     interactionCount++;
 
-    if (interactionCount === 3) {
-      touchText.innerText = "this is how it feels";
+    // 🧠 КАЖДЫЙ ТАП = новый текст
+    const messages = [
+      "this is how it feels",
+      "calm... but deep",
+      "something is forming",
+      "you are inside it",
+      "the closer you are... the stronger it becomes",
+      "still here"
+    ];
+
+    if (interactionCount <= messages.length) {
+      touchText.innerText = messages[interactionCount - 1];
     }
 
-    if (interactionCount === 6) {
-      touchText.innerText = "the closer you are...\nthe stronger it becomes";
-    }
-
-   if (interactionCount >= 9) {
+    if (interactionCount >= 6) {
      switchScreen("touchScreen", "final");
 
-     setTimeout(() => {
-       const finalScreen = document.getElementById("final");
-       const finalText = finalScreen.querySelector(".text");
+      setTimeout(() => {
+        const finalScreen = document.getElementById("final");
+        const finalText = finalScreen.querySelector(".text");
 
-       finalText.classList.add("fade-out");
+        finalText.classList.add("fade-out");
 
-       setTimeout(() => {
-         resetExperience();
-       }, 2000);
+        setTimeout(() => {
+          resetExperience();
+        }, 2000);
 
-     }, 2500);
-   }
-  }
+      }, 2500);
+    }
+}
+  /* ===== RIPPLE ===== */
 
-  function createSingleWave(x, y, delay) {
-    setTimeout(() => {
-      const wave = document.createElement("div");
-      wave.classList.add("wave");
+  function createRipple(x, y) {
+    const wave = document.createElement("div");
+    wave.classList.add("wave");
 
-      wave.style.left = (x - 175) + "px";
-      wave.style.top = (y - 175) + "px";
+    wave.style.left = (x - 90) + "px";
+    wave.style.top = (y - 90) + "px";
 
-      document.body.appendChild(wave);
+    document.body.appendChild(wave);
 
-      setTimeout(() => wave.remove(), 1800);
-    }, delay);
-  }
-
-  function playTouchSound() {
-    const touchSound = new Audio("ambient.mp3");
-    touchSound.volume = 0.05;
-
-    touchSound.play().catch(() => {
-      console.log("touch sound blocked");
-    });
+    setTimeout(() => wave.remove(), 1600);
   }
 function resetExperience() {
   interactionCount = 0;
