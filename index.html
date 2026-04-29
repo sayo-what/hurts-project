@@ -2,37 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>For Theo</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div id="container">
-
     <div id="intro" class="screen active">
         <p class="text">
             This is not a song.<br>
             This is how your voice feels.
         </p>
-        <button onclick="start()">Start</button>
+        <button class="btn-noir" onclick="start()">Begin the resonance</button>
     </div>
 
     <div id="touchScreen" class="screen">
-        <p class="text" id="touchText">
-            Touch the screen
-        </p>
+        <p class="text" id="touchText">Touch the screen to reveal the echo</p>
     </div>
 
     <div id="final" class="screen">
-        <p class="text">
+        <p class="text ethereal-text">
             Thank you for your voice<br>
             <span class="small">(from someone who truly hears it)</span>
         </p>
+        <a href="https://www.instagram.com/da_ya_alisa_a_chto/" target="_blank" class="btn-noir" id="instaBtn">Stay with me</a>
     </div>
-
 </div>
 
 <audio id="bgSound" src="ambient.mp3" loop></audio>
