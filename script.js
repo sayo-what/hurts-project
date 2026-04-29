@@ -1,109 +1,85 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   const bgSound = document.getElementById("bgSound");
   const touchScreen = document.getElementById("touchScreen");
   const touchText = document.getElementById("touchText");
+  const instaBtn = document.getElementById("instaBtn");
 
   let interactionCount = 0;
+  const messages = [
+    "Your voice is a hypnotic abyss, alluring with its honesty and depth",
+    "A magnetic sound that makes time stand still for a moment.",
+    "A deep, velvety timbre that envelops the space like a nocturnal mist",
+    "Some voices are heard with the ears",
+    "Yours — is felt with the heart..",
+    "A luminous echo that guides through the darkest of nights."
+  ];
 
-  /* ===== START ===== */
-
-  window.start = function () {
+  /* Запуск приложения */
+  window.start = function() {
     switchScreen("intro", "touchScreen");
-
     bgSound.volume = 0;
-    bgSound.play();
-
-    fadeInAudio(bgSound, 0.4, 2000);
+    bgSound.play().catch(() => console.log("Audio play blocked"));
+    fadeInAudio(bgSound, 0.4, 3000);
   };
-
-  function fadeInAudio(audio, targetVolume, duration) {
-    let step = 0.01;
-    let interval = duration / (targetVolume / step);
-
-    let fade = setInterval(() => {
-      if (audio.volume < targetVolume) {
-        audio.volume = Math.min(audio.volume + step, targetVolume);
-      } else {
-        clearInterval(fade);
-      }
-    }, interval);
-  }
 
   function switchScreen(from, to) {
     document.getElementById(from).classList.remove("active");
     document.getElementById(to).classList.add("active");
   }
 
-  /* ===== TOUCH ===== */
-
-  touchScreen.addEventListener("pointerdown", createWave);
-
-  function createWave(e) {
+  /* Обработка кликов по экрану */
+  touchScreen.addEventListener("pointerdown", (e) => {
     if (!touchScreen.classList.contains("active")) return;
 
-    const x = e.clientX;
-    const y = e.clientY;
+    createRipple(e.clientX, e.clientY);
 
-    // 🌊 одна мягкая волна (без "шума")
-    createRipple(x, y);
+    // Если фразы закончились — переходим к финалу
+    if (interactionCount >= messages.length) {
+      triggerFinal();
+      return;
+    }
+
+    // Показываем текущую фразу
+    touchText.innerText = messages[interactionCount];
+
+    // Сброс и запуск анимации появления
+    touchText.classList.remove("ethereal-fade");
+    void touchText.offsetWidth;
+    touchText.classList.add("ethereal-fade");
 
     interactionCount++;
+  });
 
-    // 🧠 КАЖДЫЙ ТАП = новый текст
-    const messages = [
-      "this is how it feels",
-      "calm... but deep",
-      "something is forming",
-      "you are inside it",
-      "the closer you are... the stronger it becomes",
-      "still here"
-    ];
+  function triggerFinal() {
+    switchScreen("touchScreen", "final");
 
-    if (interactionCount <= messages.length) {
-      touchText.innerText = messages[interactionCount - 1];
-    }
+    const finalText = document.querySelector("#final .text");
+    finalText.classList.add("ethereal-fade");
 
-    if (interactionCount >= 6) {
-     switchScreen("touchScreen", "final");
-
-      setTimeout(() => {
-        const finalScreen = document.getElementById("final");
-        const finalText = finalScreen.querySelector(".text");
-
-        finalText.classList.add("fade-out");
-
-        setTimeout(() => {
-          resetExperience();
-        }, 2000);
-
-      }, 2500);
-    }
-}
-  /* ===== RIPPLE ===== */
+    // Кнопка Инстаграма проявляется плавно через паузу
+    setTimeout(() => {
+      instaBtn.classList.add("show");
+    }, 1500);
+  }
 
   function createRipple(x, y) {
     const wave = document.createElement("div");
     wave.classList.add("wave");
-
-    wave.style.left = (x - 90) + "px";
-    wave.style.top = (y - 90) + "px";
-
+    wave.style.left = x + "px";
+    wave.style.top = y + "px";
     document.body.appendChild(wave);
-
-    setTimeout(() => wave.remove(), 1600);
+    setTimeout(() => wave.remove(), 1800);
   }
-function resetExperience() {
-  interactionCount = 0;
 
-  const finalScreen = document.getElementById("final");
-  const finalText = finalScreen.querySelector(".text");
-
-  finalText.classList.remove("fade-out");
-
-  switchScreen("final", "intro");
-
-  const touchText = document.getElementById("touchText");
-  touchText.innerText = "Touch the screen";
-}
+  function fadeInAudio(audio, target, duration) {
+    let step = 0.01;
+    let interval = duration / (target / step);
+    let fade = setInterval(() => {
+      if (audio.volume < target) {
+        audio.volume = Math.min(audio.volume + step, target);
+      } else {
+        clearInterval(fade);
+      }
+    }, interval);
+  }
 });
