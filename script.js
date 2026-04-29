@@ -80,9 +80,21 @@ document.addEventListener("DOMContentLoaded", () => {
       touchText.innerText = "the closer you are...\nthe stronger it becomes";
     }
 
-    if (interactionCount >= 9) {
-      switchScreen("touchScreen", "final");
-    }
+   if (interactionCount >= 9) {
+     switchScreen("touchScreen", "final");
+
+     setTimeout(() => {
+       const finalScreen = document.getElementById("final");
+       const finalText = finalScreen.querySelector(".text");
+
+       finalText.classList.add("fade-out");
+
+       setTimeout(() => {
+         resetExperience();
+       }, 2000);
+
+     }, 2500);
+   }
   }
 
   function createSingleWave(x, y, delay) {
@@ -107,5 +119,17 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("touch sound blocked");
     });
   }
+function resetExperience() {
+  interactionCount = 0;
 
+  const finalScreen = document.getElementById("final");
+  const finalText = finalScreen.querySelector(".text");
+
+  finalText.classList.remove("fade-out");
+
+  switchScreen("final", "intro");
+
+  const touchText = document.getElementById("touchText");
+  touchText.innerText = "Touch the screen";
+}
 });
