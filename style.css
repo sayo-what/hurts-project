@@ -99,3 +99,7 @@ canvas {
 .screen {
   pointer-events: auto;
 }
+.fade-out {
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
