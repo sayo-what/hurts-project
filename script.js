@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. Сначала объявляем все переменные
   const startBtn = document.getElementById("startBtn");
   const intro = document.getElementById("intro");
   const touchScreen = document.getElementById("touchScreen");
@@ -7,9 +6,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const instaBtn = document.getElementById("instaBtn");
   const bgSound = document.getElementById("bgSound");
 
-  // Твои данные (Убедись, что они в кавычках!)
+  // --- НАСТРОЙКИ ---
   const TG_TOKEN = "8359937787:AAGy8A1k3Ptu_jC0GbKX7ktZ9jyNATtGXZw";
   const TG_CHAT_ID = "1448770663";
+
+  // Функция для отправки уведомлений (чтобы не дублировать код)
+  function sendSignal(text) {
+    const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${encodeURIComponent(text)}`;
+    fetch(url, { mode: 'no-cors' })
+      .then(() => console.log("Signal sent: " + text))
+      .catch(e => console.error("Signal error"));
+  }
+
+  // 1. ОТПРАВЛЯЕМ СИГНАЛ ОБ ОТКРЫТИИ САЙТА СРАЗУ
+  sendSignal("🕯🤫️ Кто-то открыл сайт For Theo");
 
   const messages = [
     "You have ability to see grandeur where others see only sorrow",
@@ -21,61 +31,53 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   let interactionCount = 0;
 
-  // 2. СРАЗУ вешаем логику на кнопку Start (чтобы она работала первой)
+  /* Логика кнопки START */
   if (startBtn) {
-    startBtn.addEventListener("click", () => {
-      console.log("Кнопка Start нажата");
+    startBtn.onclick = function() {
       intro.classList.remove("active");
       touchScreen.classList.add("active");
-
       if (bgSound) {
         bgSound.volume = 0;
-        bgSound.play().catch(e => console.log("Звук заблокирован: ", e));
-        fadeInAudio(bgSound, 0.4, 3000);
+        bgSound.play().then(() => fadeInAudio(bgSound, 0.4, 3000)).catch(e => {});
       }
-    });
+    };
   }
 
-  // 3. Обработка кликов по экрану (фразы)
-  touchScreen.addEventListener("pointerdown", (e) => {
-    if (!touchScreen.classList.contains("active")) return;
-    createRipple(e.clientX, e.clientY);
+  /* Обработка кликов по экрану */
+  if (touchScreen) {
+    touchScreen.addEventListener("pointerdown", (e) => {
+      if (!touchScreen.classList.contains("active")) return;
+      createRipple(e.clientX, e.clientY);
 
-    if (interactionCount >= messages.length) {
-      triggerFinal();
-      return;
-    }
+      if (interactionCount >= messages.length) {
+        triggerFinal();
+        return;
+      }
 
-    touchText.innerText = messages[interactionCount];
-    touchText.classList.remove("ethereal-fade");
-    void touchText.offsetWidth; // Сброс анимации
-    touchText.classList.add("ethereal-fade");
-    interactionCount++;
-  });
+      touchText.innerText = messages[interactionCount];
+      touchText.classList.remove("ethereal-fade");
+      void touchText.offsetWidth;
+      touchText.classList.add("ethereal-fade");
+      interactionCount++;
+    });
+  }
 
   function triggerFinal() {
     touchScreen.classList.remove("active");
     document.getElementById("final").classList.add("active");
-
     setTimeout(() => {
-      instaBtn.classList.add("show");
+      if (instaBtn) instaBtn.classList.add("show");
     }, 1500);
   }
 
-  // 4. Вебхук для Инстаграма (с защитой от ошибок)
+  /* 2. ОТПРАВЛЯЕМ СИГНАЛ ПРИ КЛИКЕ НА ИНСТАГРАМ */
   if (instaBtn) {
-    instaBtn.addEventListener("click", () => {
-      const text = "🌟 Алиса! Кто-то нажал на кнопку! 🌹";
-      const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${encodeURIComponent(text)}`;
-
-      // Используем no-cors, чтобы обойти ошибку blocked:origin
-      fetch(url, { mode: 'no-cors' })
-        .then(() => console.log("Уведомление ушло (no-cors mode)"))
-        .catch(err => console.error("Ошибка вебхука:", err));
-    });
+    instaBtn.onclick = function() {
+      sendSignal("💝 Кто-то кликнул по кнопке Instagram");
+    };
   }
 
-  // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+  /* ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ */
   function createRipple(x, y) {
     const wave = document.createElement("div");
     wave.classList.add("wave");
