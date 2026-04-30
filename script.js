@@ -1,67 +1,81 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const bgSound = document.getElementById("bgSound");
+  // 1. Сначала объявляем все переменные
+  const startBtn = document.getElementById("startBtn");
+  const intro = document.getElementById("intro");
   const touchScreen = document.getElementById("touchScreen");
   const touchText = document.getElementById("touchText");
   const instaBtn = document.getElementById("instaBtn");
+  const bgSound = document.getElementById("bgSound");
 
-  let interactionCount = 0;
+  // Твои данные (Убедись, что они в кавычках!)
+  const TG_TOKEN = "8359937787:AAGy8A1k3Ptu_jC0GbKX7ktZ9jyNATtGXZw";
+  const TG_CHAT_ID = "1448770663";
+
   const messages = [
-    "Your voice is a hypnotic abyss, alluring with its honesty and depth",
-    "A magnetic sound that makes time stand still for a moment.",
-    "A deep, velvety timbre that envelops the space like a nocturnal mist",
-    "Some voices are heard with the ears",
-    "Yours — is felt with the heart..",
-    "A luminous echo that guides through the darkest of nights."
+    "You have ability to see grandeur where others see only sorrow",
+    "An unextinguished light in the eyes of one who believes in the dawn",
+    "A magnetic sound that makes time stand still for a moment",
+    "Some voices are heard with the ears..",
+    "Yours — is felt with the heart",
+    "A luminous echo that guides through the darkest of nights"
   ];
+  let interactionCount = 0;
 
-  /* Запуск приложения */
-  window.start = function() {
-    switchScreen("intro", "touchScreen");
-    bgSound.volume = 0;
-    bgSound.play().catch(() => console.log("Audio play blocked"));
-    fadeInAudio(bgSound, 0.4, 3000);
-  };
+  // 2. СРАЗУ вешаем логику на кнопку Start (чтобы она работала первой)
+  if (startBtn) {
+    startBtn.addEventListener("click", () => {
+      console.log("Кнопка Start нажата");
+      intro.classList.remove("active");
+      touchScreen.classList.add("active");
 
-  function switchScreen(from, to) {
-    document.getElementById(from).classList.remove("active");
-    document.getElementById(to).classList.add("active");
+      if (bgSound) {
+        bgSound.volume = 0;
+        bgSound.play().catch(e => console.log("Звук заблокирован: ", e));
+        fadeInAudio(bgSound, 0.4, 3000);
+      }
+    });
   }
 
-  /* Обработка кликов по экрану */
+  // 3. Обработка кликов по экрану (фразы)
   touchScreen.addEventListener("pointerdown", (e) => {
     if (!touchScreen.classList.contains("active")) return;
-
     createRipple(e.clientX, e.clientY);
 
-    // Если фразы закончились — переходим к финалу
     if (interactionCount >= messages.length) {
       triggerFinal();
       return;
     }
 
-    // Показываем текущую фразу
     touchText.innerText = messages[interactionCount];
-
-    // Сброс и запуск анимации появления
     touchText.classList.remove("ethereal-fade");
-    void touchText.offsetWidth;
+    void touchText.offsetWidth; // Сброс анимации
     touchText.classList.add("ethereal-fade");
-
     interactionCount++;
   });
 
   function triggerFinal() {
-    switchScreen("touchScreen", "final");
+    touchScreen.classList.remove("active");
+    document.getElementById("final").classList.add("active");
 
-    const finalText = document.querySelector("#final .text");
-    finalText.classList.add("ethereal-fade");
-
-    // Кнопка Инстаграма проявляется плавно через паузу
     setTimeout(() => {
       instaBtn.classList.add("show");
     }, 1500);
   }
 
+  // 4. Вебхук для Инстаграма (с защитой от ошибок)
+  if (instaBtn) {
+    instaBtn.addEventListener("click", () => {
+      const text = "🌟 Алиса! Кто-то нажал на кнопку! 🌹";
+      const url = `https://api.telegram.org/bot${TG_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${encodeURIComponent(text)}`;
+
+      // Используем no-cors, чтобы обойти ошибку blocked:origin
+      fetch(url, { mode: 'no-cors' })
+        .then(() => console.log("Уведомление ушло (no-cors mode)"))
+        .catch(err => console.error("Ошибка вебхука:", err));
+    });
+  }
+
+  // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
   function createRipple(x, y) {
     const wave = document.createElement("div");
     wave.classList.add("wave");

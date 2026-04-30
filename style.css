@@ -72,6 +72,7 @@ html, body {
 /* Универсальный стиль кнопок */
 .btn-noir {
   display: inline-block;
+  position: relative;
    font-family: "Linotype Didot", "HTF Didot", "Didot", "Georgia", serif;
   margin-top: 40px;
   padding: 14px 40px;
